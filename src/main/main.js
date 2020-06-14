@@ -16,6 +16,10 @@ if (process.env.NODE_ENV === "production") {
   global.__images = path.join(__dirname, "./images");
 }
 
+protocol.registerSchemesAsPrivileged([
+  { scheme: "app", privileges: { secure: true, standard: true } },
+]);
+
 const prevIcon =
   process.env.NODE_ENV === "development"
     ? "public/images/prev.png"
