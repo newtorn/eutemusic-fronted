@@ -77,7 +77,7 @@ module.exports = {
   },
 
   // 打包输出路径
-  outputDir: 'dist/web',
+  outputDir: "dist/web",
   css: {
     // 是否使用css分离插件 ExtractTextPlugin
     extract: isProd,
@@ -87,20 +87,45 @@ module.exports = {
     loaderOptions: {
       less: {
         modifyVars: {
-          'primary-color': '#c62f2f',
-          'link-color': '#c62f2f',
-          'border-radius-base': '4px'
+          "primary-color": "#c62f2f",
+          "link-color": "#c62f2f",
+          "border-radius-base": "4px",
         },
-        javascriptEnabled: true
-      }
+        javascriptEnabled: true,
+      },
     },
     // 启用 CSS modules for all css / pre-processor files.
-    requireModuleExtension: true
+    requireModuleExtension: true,
+  },
+
+  // 开发服务器http代理
+  devServer: {
+    open: !process.argv.includes("electron:serve"),
+    host: "localhost",
+    port: 9080,
+    https: false,
+    hotOnly: false,
+    proxy: {
+      "/api": {
+        target: "http://localhost:9999/",
+        changeOrigin: true, // 是否跨域
+        ws: true, // 代理长连接
+        pathRewrite: {
+          "^/api": "/",
+        }, // 重写接口
+      },
+      "/socket": {
+        target: "ws://localhost:9999/",
+        ws: true,
+      },
+    },
   },
 
   // 第三方插件配置
   pluginOptions: {
     electronBuilder: {
+      nodeIntegration: true,
+      nodeIntegrationInWorker: true,
       builderOptions: {
         win: {
           icon: "build/icons/icon.ico",
@@ -171,7 +196,7 @@ module.exports = {
           return args;
         });
       },
-      outputDir: 'dist/electron',
+      outputDir: "dist/electron",
       mainProcessFile: "src/main/main.js",
       mainProcessWatch: ["src/main"],
     },

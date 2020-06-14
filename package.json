@@ -2,6 +2,8 @@
   "name": "eutemusic",
   "version": "0.1.0",
   "private": true,
+  "main": "background.js",
+  "appId": "com.newtorn.eutemusic",
   "scripts": {
     "lint": "vue-cli-service lint",
     "build": "vue-cli-service electron:build",
@@ -10,7 +12,6 @@
     "postuninstall": "electron-builder install-app-deps",
     "gitpush": "git push github master && git push gitee master"
   },
-  "main": "background.js",
   "dependencies": {
     "core-js": "^3.6.5",
     "vue": "^2.6.11"
