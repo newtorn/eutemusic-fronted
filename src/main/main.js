@@ -3,18 +3,15 @@
 import { app, protocol, BrowserWindow } from "electron";
 import path from "path";
 import pkg from "./../../package.json";
-import {
-  createProtocol,
-  /* installVueDevtools */
-} from "vue-cli-plugin-electron-builder/lib";
-import { SCHEME, LOAD_URL } from './config';
+import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
+import { SCHEME, LOAD_URL } from "./config";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
-
 if (process.env.NODE_ENV === "production") {
   global.__img = path.join(__dirname, "./img");
   global.__images = path.join(__dirname, "./images");
 }
+let mainWindow = null;
 
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } },
@@ -66,7 +63,7 @@ const setThumbarButtons = function(mainWindow, playing) {
 };
 
 function createWindow() {
-  let mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -105,7 +102,7 @@ function createWindow() {
     mainWindow = null;
   });
 
-  mainWindow.once("ready-to-show", () => {
+  mainWindow.once("ready-to-show", async () => {
     mainWindow.show();
     // 设置任务栏操作和缩略图
     if (process.platform === "win32") {
@@ -115,6 +112,8 @@ function createWindow() {
     // global.lyricWindow = createLyricWindow(BrowserWindow);
     // global.miniWindow = createMiniWindow(BrowserWindow);
   });
+
+  global.mainWindow = mainWindow;
 }
 
 app.on("window-all-closed", () => {
@@ -129,24 +128,19 @@ app.on("activate", () => {
   }
 });
 
-app.whenReady().then(() => {
-    if (isDevelopment && !process.env.IS_TEST) {
-        // Install Vue Devtools
-        // Devtools extensions are broken in Electron 6.0.0 and greater
-        // See https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/378 for more info
-        // Electron will not launch with Devtools extensions installed on Windows 10 with dark mode
-        // If you are not using Windows 10 dark mode, you may uncomment these lines
-        // In addition, if the linked issue is closed, you can upgrade electron and uncomment these lines
-        // try {
-        //   await installVueDevtools()
-        // } catch (e) {
-        //   console.error('Vue Devtools failed to install:', e.toString())
-        // }
-      }
-      createWindow();
-})
+app.whenReady().then(async () => {
+  createWindow();
+  if (isDevelopment && !process.env.IS_TEST) {
+    // 安装 Vue Devtools
+    try {
+      mainWindow.webContents.session.loadExtension("src/main/vue-devtools");
+    } catch (e) {
+      console.error("Vue Devtools failed to install:", e.toString());
+    }
+  }
+});
 
-// Exit cleanly on request from parent process in development mode.
+// 处于开发者模式时干净地从父进程退出
 if (isDevelopment) {
   if (process.platform === "win32") {
     process.on("message", (data) => {
