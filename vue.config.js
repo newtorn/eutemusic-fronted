@@ -86,12 +86,14 @@ module.exports = {
     // css预设器配置项
     loaderOptions: {
       less: {
-        modifyVars: {
-          "primary-color": "#c62f2f",
-          "link-color": "#c62f2f",
-          "border-radius-base": "4px",
+        lessOptions: {
+          modifyVars: {
+            "primary-color": "#c62f2f",
+            "link-color": "#c62f2f",
+            "border-radius-base": "4px",
+          },
+          javascriptEnabled: true,
         },
-        javascriptEnabled: true,
       },
     },
     // 启用 CSS modules for all css / pre-processor files.
