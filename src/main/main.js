@@ -65,9 +65,10 @@ const setThumbarButtons = function(mainWindow, playing) {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1010,
+    height: 694,
     frame: false,
+    resizable: false,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       nodeIntegrationInWorker: true,
