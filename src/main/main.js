@@ -3,6 +3,7 @@
 import { app, protocol, BrowserWindow } from "electron";
 import path from "path";
 import pkg from "./../../package.json";
+import { initIpcEvent } from "./modules/ipc-event"
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { SCHEME, LOAD_URL } from "./config";
 
@@ -66,6 +67,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    frame: false,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       nodeIntegrationInWorker: true,
@@ -113,7 +115,20 @@ function createWindow() {
     // global.miniWindow = createMiniWindow(BrowserWindow);
   });
 
+  if (isDevelopment && !process.env.IS_TEST) {
+    // 安装 Vue Devtools
+    try {
+      mainWindow.webContents.session.loadExtension(
+        path.resolve(__dirname, "./../../src/main/vue-devtools")
+      );
+    } catch (e) {
+      console.error("Vue Devtools failed to install:", e.toString());
+    }
+  }
+
   global.mainWindow = mainWindow;
+
+  initIpcEvent();
 }
 
 app.on("window-all-closed", () => {
@@ -128,17 +143,7 @@ app.on("activate", () => {
   }
 });
 
-app.whenReady().then(async () => {
-  createWindow();
-  if (isDevelopment && !process.env.IS_TEST) {
-    // 安装 Vue Devtools
-    try {
-      mainWindow.webContents.session.loadExtension("src/main/vue-devtools");
-    } catch (e) {
-      console.error("Vue Devtools failed to install:", e.toString());
-    }
-  }
-});
+app.whenReady().then(createWindow);
 
 // 处于开发者模式时干净地从父进程退出
 if (isDevelopment) {
