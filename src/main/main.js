@@ -67,6 +67,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1010,
     height: 694,
+    backgroundColor: "#2d2d2d",
     frame: false,
     resizable: false,
     webPreferences: {
